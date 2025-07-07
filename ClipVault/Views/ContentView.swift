@@ -1,9 +1,25 @@
 import SwiftUI
 import AppKit
 
+enum ClipboardFilter: String, CaseIterable, Identifiable {
+    case all, text, image, file
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .all: return "All"
+        case .text: return "Text"
+        case .image: return "Images"
+        case .file: return "Files"
+        }
+    }
+}
+
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var context
     @StateObject private var viewModel: ClipboardViewModel
+    @State private var selectedFilter: ClipboardFilter = .all
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \ClipboardEntry.date, ascending: false)],
@@ -17,8 +33,25 @@ struct ContentView: View {
             animation: .default)
     }
 
+    private var filteredEntries: [ClipboardEntry] {
+        switch selectedFilter {
+        case .all:
+            return Array(entries)
+        default:
+            return entries.filter { $0.type == selectedFilter.rawValue }
+        }
+    }
+
     var body: some View {
-        Table(entries) {
+        NavigationView {
+            List(ClipboardFilter.allCases, selection: $selectedFilter) { filter in
+                Text(filter.title)
+                    .tag(filter)
+            }
+            .listStyle(SidebarListStyle())
+            .frame(minWidth: 150)
+
+            Table(filteredEntries) {
             TableColumn("Preview") { entry in
                 if let image = entry.previewImage {
                     Image(nsImage: image)
@@ -51,6 +84,7 @@ struct ContentView: View {
             }
         }
         .frame(minWidth: 500, minHeight: 400)
+        }
     }
 }
 
