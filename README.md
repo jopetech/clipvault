@@ -8,6 +8,7 @@ ClipVault is a clipboard manager for macOS built with SwiftUI. It stores everyth
 - iCloud support via `NSPersistentCloudKitContainer` to keep your history in sync.
 - Shows previews for text and images and file icons for other formats.
 - Allows copying any item back to the system pasteboard with a single button.
+- Open a compact Quick Paste window with `⌘⌥V` to quickly select an entry for pasting.
 
 ## Requirements
 
